@@ -1,22 +1,28 @@
-import { Link } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome } from '@fortawesome/free-solid-svg-icons'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome } from '@fortawesome/free-solid-svg-icons';
 
-function Navbar() {
+const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/">
-          <FontAwesomeIcon icon={faHome} /> Logo
+          <span className="logo-text">IBDO</span>
         </Link>
       </div>
-      <div className="navbar-menu">
+      <button className="menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        ☰
+      </button>
+      <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
         <Link to="/">Ana Sayfa</Link>
-        <Link to="/hakkimizda">Hakkımızda</Link>
-        <Link to="/iletisim">İletişim</Link>
+        <Link to="/game">Alkol Çarkı</Link>
+        <Link to="/truth-or-dare">Doğruluk mu Cesaret mi?</Link>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar 
+export default Navbar; 

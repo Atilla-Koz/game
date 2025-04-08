@@ -1,24 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../assets/styles/truthordare.css';
 
 const TruthOrDare = () => {
-  const [players, setPlayers] = useState([]);
+  // localStorage'dan verileri yükle
+  const [players, setPlayers] = useState(() => {
+    const savedPlayers = localStorage.getItem('truthOrDarePlayers');
+    return savedPlayers ? JSON.parse(savedPlayers) : [];
+  });
+
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem('truthOrDareTasks');
+    return savedTasks ? JSON.parse(savedTasks) : {
+      truth: {
+        masum: ['En son söylediğin yalan neydi?', 'En utanç verici anın nedir?'],
+        orta: ['En büyük pişmanlığın nedir?', 'Hiç birine aşık oldun mu?'],
+        plus18: ['En çılgın fantezin nedir?', 'Hiç aldattın mı?']
+      },
+      dare: {
+        masum: ['10 şınav çek', 'Tavuk gibi ses çıkar'],
+        orta: ['Komik bir dans yap', 'Bir yabancıya sarıl'],
+        plus18: ['Karşı cinsle 1 dakika göz teması kur', 'Birini öp']
+      }
+    };
+  });
+
+  const [difficulty, setDifficulty] = useState(() => {
+    const savedDifficulty = localStorage.getItem('truthOrDareDifficulty');
+    return savedDifficulty || 'masum';
+  });
+
+  const [isRandomMode, setIsRandomMode] = useState(() => {
+    const savedRandomMode = localStorage.getItem('truthOrDareRandomMode');
+    return savedRandomMode === 'true';
+  });
+
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showTask, setShowTask] = useState(false);
   const [currentTask, setCurrentTask] = useState('');
-  const [difficulty, setDifficulty] = useState('masum');
   const [showPenalty, setShowPenalty] = useState(false);
   const [newTask, setNewTask] = useState({ type: 'truth', content: '', difficulty: 'masum' });
   const [showTaskManager, setShowTaskManager] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [isRandomMode, setIsRandomMode] = useState(false);
 
   const difficultyLevels = ['masum', 'orta', 'plus18'];
 
-  // Örnek görevler
-  const [tasks, setTasks] = useState({
+  const defaultTasks = {
     truth: {
       masum: ['En son söylediğin yalan neydi?', 'En utanç verici anın nedir?'],
       orta: ['En büyük pişmanlığın nedir?', 'Hiç birine aşık oldun mu?'],
@@ -29,7 +57,24 @@ const TruthOrDare = () => {
       orta: ['Komik bir dans yap', 'Bir yabancıya sarıl'],
       plus18: ['Karşı cinsle 1 dakika göz teması kur', 'Birini öp']
     }
-  });
+  };
+
+  // localStorage'a verileri kaydet
+  useEffect(() => {
+    localStorage.setItem('truthOrDarePlayers', JSON.stringify(players));
+  }, [players]);
+
+  useEffect(() => {
+    localStorage.setItem('truthOrDareTasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('truthOrDareDifficulty', difficulty);
+  }, [difficulty]);
+
+  useEffect(() => {
+    localStorage.setItem('truthOrDareRandomMode', isRandomMode);
+  }, [isRandomMode]);
 
   const getRandomDifficulty = () => {
     return difficultyLevels[Math.floor(Math.random() * difficultyLevels.length)];
@@ -109,6 +154,17 @@ const TruthOrDare = () => {
     setEditingTask(null);
   };
 
+  const handleRemovePlayer = (index) => {
+    setPlayers(players.filter((_, i) => i !== index));
+  };
+
+  const resetTasks = () => {
+    if (window.confirm('Tüm görevler varsayılan haline döndürülecek. Emin misiniz?')) {
+      setTasks(defaultTasks);
+      localStorage.removeItem('truthOrDareTasks');
+    }
+  };
+
   return (
     <div className="truth-or-dare-container">
       {!gameStarted ? (
@@ -126,7 +182,16 @@ const TruthOrDare = () => {
           </div>
           <div className="players-list">
             {players.map((player, index) => (
-              <div key={index} className="player-item">{player}</div>
+              <div key={index} className="player-item">
+                <span>{player}</span>
+                <button 
+                  className="remove-player" 
+                  onClick={() => handleRemovePlayer(index)}
+                  title="Oyuncuyu Sil"
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
           <div className="game-mode-select">
@@ -243,22 +308,35 @@ const TruthOrDare = () => {
 
       <div className="add-task-container">
         <h3>Yeni Görev Ekle</h3>
-        <select value={newTask.type} onChange={(e) => setNewTask({...newTask, type: e.target.value})}>
-          <option value="truth">Doğruluk</option>
-          <option value="dare">Cesaret</option>
-        </select>
-        <select value={newTask.difficulty} onChange={(e) => setNewTask({...newTask, difficulty: e.target.value})}>
-          <option value="masum">Masum</option>
-          <option value="orta">Orta</option>
-          <option value="plus18">+18</option>
-        </select>
-        <input
-          type="text"
-          value={newTask.content}
-          onChange={(e) => setNewTask({...newTask, content: e.target.value})}
-          placeholder="Görev içeriği"
-        />
-        <button onClick={addNewTask}>Görev Ekle</button>
+        <div className="add-task-form">
+          <select 
+            value={newTask.type} 
+            onChange={(e) => setNewTask({...newTask, type: e.target.value})}
+          >
+            <option value="truth">Doğruluk</option>
+            <option value="dare">Cesaret</option>
+          </select>
+          <select 
+            value={newTask.difficulty} 
+            onChange={(e) => setNewTask({...newTask, difficulty: e.target.value})}
+          >
+            <option value="masum">Masum</option>
+            <option value="orta">Orta</option>
+            <option value="plus18">+18</option>
+          </select>
+          <input
+            type="text"
+            value={newTask.content}
+            onChange={(e) => setNewTask({...newTask, content: e.target.value})}
+            placeholder="Görev içeriğini yazın..."
+          />
+        </div>
+        <button className="add-task-button" onClick={addNewTask}>
+          Görev Ekle
+        </button>
+        <button className="reset-tasks-button" onClick={resetTasks}>
+          Görevleri Sıfırla
+        </button>
       </div>
     </div>
   );

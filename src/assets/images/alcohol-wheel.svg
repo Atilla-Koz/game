@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="90" fill="#FF416C" />
+  <circle cx="100" cy="100" r="80" fill="#FF4B2B" />
+  <circle cx="100" cy="100" r="70" fill="#FF416C" />
+  <circle cx="100" cy="100" r="60" fill="#FF4B2B" />
+  <circle cx="100" cy="100" r="50" fill="#FF416C" />
+  <circle cx="100" cy="100" r="40" fill="#FF4B2B" />
+  <circle cx="100" cy="100" r="30" fill="#FF416C" />
+  <circle cx="100" cy="100" r="20" fill="#FF4B2B" />
+  <circle cx="100" cy="100" r="10" fill="#FF416C" />
+  
+  <!-- İçecek simgeleri -->
+  <path d="M70,70 L130,70 L130,130 L70,130 Z" fill="white" opacity="0.3" />
+  <path d="M80,80 L120,80 L120,120 L80,120 Z" fill="white" opacity="0.5" />
+  
+  <!-- Ok işareti -->
+  <path d="M100,30 L110,50 L90,50 Z" fill="white" />
+</svg> 
